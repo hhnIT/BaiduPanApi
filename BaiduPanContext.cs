@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Extensions;
+using System.Web;
 
 namespace BaiduPanApi
 {
@@ -14,11 +15,13 @@ namespace BaiduPanApi
 	{
 		private const string
 			ClientUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.67 Safari/537.36",
+			PcsAppId = "250528",
 			BaiduHomeUrl = "https://www.baidu.com",
 			BaiduPassportUrl = "https://passport.baidu.com",
 			BaiduLoginApiUrl = BaiduPassportUrl + "/v2/api",
 			BaiduPanHomeUrl = "https://pan.baidu.com",
 			BaiduPanApiUrl = BaiduPanHomeUrl + "/api",
+			BaiduPanPcsUrl = "https://pcs.baidu.com/rest/2.0/pcs",
 			TokenRegex = "[a-z0-9]{32}",
 			LoginTokenRegex = "^" + TokenRegex + "$",
 			BdsTokenRegex = "\"bdstoken\":\"(" + TokenRegex + ")\"",
@@ -254,6 +257,16 @@ namespace BaiduPanApi
 			CheckResponseStatus(response);
 			var result = ParseJson<BaiduData.ApiResult>(response);
 			if (result.ErrorCode != 0) throw new BaiduPanApiException(result.ErrorCode);
+		}
+
+		public virtual HttpWebRequest GetDownloadRequest(string path)
+		{
+			var url = new Uri($"{BaiduPanPcsUrl}/file?method=download&app_id={PcsAppId}&path={HttpUtility.UrlEncode(path)}");
+			var request = WebRequest.CreateHttp(url);
+			request.Headers.Add("Cookie", client.CookieContainer.GetCookieHeader(url));
+			request.Headers.Add("Accept-Encoding", "gzip;deflate");
+			request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+			return request;
 		}
 
 		public virtual BaiduPanQuota GetQuota()
