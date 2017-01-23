@@ -42,7 +42,7 @@ namespace BaiduPanApi
 			Login(username, password, GetLoginToken(cookies), cookies);
 
 			bdsToken = GetBdsToken(cookies);
-			client = new RestClient(BaiduPanApiUrl) { CookieContainer = cookies, UserAgent = ClientUserAgent };
+			client = new RestClient(BaiduPanApiUrl) { CookieContainer = cookies };
 			Username = username;
 		}
 
@@ -97,7 +97,7 @@ namespace BaiduPanApi
 
 		private string GetLoginToken(CookieContainer cookies)
 		{
-			var client = new RestClient(BaiduLoginApiUrl) { CookieContainer = cookies, UserAgent = ClientUserAgent };
+			var client = new RestClient(BaiduLoginApiUrl) { CookieContainer = cookies };
 			var request = new RestRequest("?getapi");
 			request.AddParameter("tpl", "netdisk");
 			request.AddParameter("apiver", "v3");
@@ -112,7 +112,7 @@ namespace BaiduPanApi
 
 		private void Login(string username, string password, string token, CookieContainer cookies)
 		{
-			var client = new RestClient(BaiduLoginApiUrl) { CookieContainer = cookies, UserAgent = ClientUserAgent };
+			var client = new RestClient(BaiduLoginApiUrl) { CookieContainer = cookies };
 			var request = new RestRequest("?login", Method.POST);
 			request.AddParameter("tpl", "netdisk");
 			request.AddParameter("apiver", "v3");
@@ -130,7 +130,7 @@ namespace BaiduPanApi
 
 		private string GetBdsToken(CookieContainer cookies)
 		{
-			var client = new RestClient(BaiduPanHomeUrl) { CookieContainer = cookies, UserAgent = ClientUserAgent };
+			var client = new RestClient(BaiduPanHomeUrl) { CookieContainer = cookies };
 			var response = client.Execute(new RestRequest());
 			CheckResponseStatus(response);
 			var match = Regex.Match(response.Content, BdsTokenRegex);
@@ -140,7 +140,7 @@ namespace BaiduPanApi
 
 		private void Logout(CookieContainer cookies)
 		{
-			var client = new RestClient(BaiduPassportUrl) { CookieContainer = cookies, UserAgent = ClientUserAgent };
+			var client = new RestClient(BaiduPassportUrl) { CookieContainer = cookies };
 			CheckResponseStatus(client.Execute(new RestRequest("?logout")));
 		}
 
