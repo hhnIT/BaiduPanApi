@@ -39,6 +39,8 @@ namespace BaiduPanApi
 			cache = new MemoryCache(CacheNamePrefix + Username);
 		}
 
+		public void RefreshCache(string path) => RemoveCacheByPrefixes(path + "$");
+
 		public override IEnumerable<BaiduPanFileInformation> ListDirectory(string path)
 			=> GetData($"{path}${nameof(ListDirectory)}", () => base.ListDirectory(path));
 
