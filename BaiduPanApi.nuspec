@@ -9,5 +9,7 @@
     <licenseUrl>https://github.com/HackingBaidu/BaiduPanApi/v$version$/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/HackingBaidu/BaiduPanApi</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <releaseNotes>Add upload feature.
+Remove UserAgent header for some HTTP requests.</releaseNotes>
   </metadata>
 </package>
