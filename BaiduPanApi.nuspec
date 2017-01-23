@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <description>$description$</description>
+    <licenseUrl>https://github.com/HackingBaidu/BaiduPanApi/v$version$/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/HackingBaidu/BaiduPanApi</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+  </metadata>
+</package>
