@@ -6,7 +6,7 @@
     <title>$title$</title>
     <authors>$author$</authors>
     <description>$description$</description>
-    <licenseUrl>https://github.com/HackingBaidu/BaiduPanApi/v$version$/master/LICENSE</licenseUrl>
+    <licenseUrl>https://github.com/HackingBaidu/BaiduPanApi/blob/v$version$/LICENSE</licenseUrl>
     <projectUrl>https://github.com/HackingBaidu/BaiduPanApi</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <releaseNotes>Add upload feature.
