@@ -5,6 +5,7 @@ using System.Reflection;
 [assembly: AssemblyProduct("BaiduPanApi")]
 [assembly: AssemblyDescription("A .NET wrapper for BaiduPan API.")]
 [assembly: AssemblyCompany("Stalker")]
+[assembly: AssemblyCopyright("Copyright © HackingBaidu Project 2017")]
 
 [assembly: ComVisible(false)]
 
