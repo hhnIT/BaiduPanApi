@@ -76,10 +76,11 @@ namespace BaiduPanApi
 			catch (Exception ex) { throw new FormatException(FormatErrorMessage, ex); }
 		}
 
-		protected (string, string) SplitPath(string path)
+		protected void SplitPath(string path, out string dir, out string name)
 		{
 			var index = path.LastIndexOf('/');
-			return (index == 0 ? "/" : path.Substring(0, index), path.Substring(index + 1));
+			dir = index == 0 ? "/" : path.Substring(0, index);
+			name = path.Substring(index + 1);
 		}
 
 		#endregion
@@ -170,7 +171,7 @@ namespace BaiduPanApi
 
 		public virtual BaiduPanFileInformation GetItemInformation(string path)
 		{
-			(var dir, var name) = SplitPath(path);
+			SplitPath(path, out var dir, out var name);
 			try { return ListDirectory(dir).First(file => string.Equals(file.Name, name, StringComparison.OrdinalIgnoreCase)); }
 			catch (InvalidOperationException ex) { throw new FileNotFoundException(string.Empty, ex); }
 		}

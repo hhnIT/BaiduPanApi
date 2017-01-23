@@ -54,14 +54,14 @@ namespace BaiduPanApi
 		public override void DeleteItem(string path)
 		{
 			base.DeleteItem(path);
-			(var dir, var name) = SplitPath(path);
+			SplitPath(path, out var dir, out var name);
 			RemoveCacheByPrefixes(dir + "$", path + "/", path + "$");
 		}
 
 		public override void MoveItem(string path, string dest, string newName)
 		{
 			base.MoveItem(path, dest, newName);
-			(var dir, var name) = SplitPath(path);
+			SplitPath(path, out var dir, out var name);
 			var newPath = $"{(dest == "/" ? string.Empty : dest)}/{newName}";
 			RemoveCacheByPrefixes(dir + "$", path + "/", path + "$", dest + "$", newPath + "$", newPath + "/");
 		}
@@ -69,7 +69,7 @@ namespace BaiduPanApi
 		public override void RenameItem(string path, string newName)
 		{
 			base.RenameItem(path, newName);
-			(var dir, var name) = SplitPath(path);
+			SplitPath(path, out var dir, out var name);
 			var newPath = $"{(dir == "/" ? string.Empty : dir)}/{newName}";
 			RemoveCacheByPrefixes(dir + "$", path + "/", path + "$", newPath + "$", newPath + "/");
 		}
@@ -77,7 +77,7 @@ namespace BaiduPanApi
 		public override void CreateDirectory(string path)
 		{
 			base.CreateDirectory(path);
-			(var dir, var name) = SplitPath(path);
+			SplitPath(path, out var dir, out var name);
 			RemoveCacheByPrefixes(dir + "$", path + "/", path + "$");
 		}
 	}
