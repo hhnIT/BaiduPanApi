@@ -3,7 +3,7 @@
 namespace BaiduPanApi.BaiduData
 {
 	[JsonObject(ItemRequired = Required.Always)]
-	struct FileInfo
+	class FileInfo
 	{
 		[JsonProperty("server_filename")]
 		public string Name;

@@ -3,7 +3,7 @@
 namespace BaiduPanApi.BaiduData
 {
 	[JsonObject(ItemRequired = Required.Always)]
-	struct LoginTokenData
+	class LoginTokenData
 	{
 		[JsonProperty("token")]
 		public string LoginToken;

@@ -3,7 +3,7 @@
 namespace BaiduPanApi.BaiduData
 {
 	[JsonObject(ItemRequired = Required.Always)]
-	struct LoginTokenErrorInfo
+	class LoginTokenErrorInfo
 	{
 		[JsonProperty("no")]
 		public int ErrorCode;
