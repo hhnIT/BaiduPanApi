@@ -80,6 +80,7 @@ namespace BaiduPanApi
 		};
 
 		public int ErrorCode { get; }
+		public bool IsUnknownError => ErrorMessages.ContainsKey(ErrorCode);
 		public override string Message => ErrorMessages.TryGetValue(ErrorCode, out var msg) ? msg : "Unknown error";
 
 		public BaiduPanApiException(int errorCode) { ErrorCode = errorCode; }
