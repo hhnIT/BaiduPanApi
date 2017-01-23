@@ -270,6 +270,16 @@ namespace BaiduPanApi
 			return request;
 		}
 
+		public virtual HttpWebRequest GetUploadRequest(string path, string postBoundry)
+		{
+			var url = new Uri($"{BaiduPanPcsUrl}/file?method=upload&app_id={PcsAppId}&path={HttpUtility.UrlEncode(path)}");
+			var request = WebRequest.CreateHttp(url);
+			request.Method = "POST";
+			request.ContentType = "multipart/form-data; boundary=" + postBoundry;
+			request.Headers.Add("Cookie", client.CookieContainer.GetCookieHeader(url));
+			return request;
+		}
+
 		public virtual BaiduPanQuota GetQuota()
 		{
 			var response = client.Execute(new RestRequest("quota"));
