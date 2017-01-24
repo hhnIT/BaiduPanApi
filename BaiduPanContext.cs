@@ -270,12 +270,12 @@ namespace BaiduPanApi
 			return request;
 		}
 
-		public virtual HttpWebRequest GetUploadRequest(string path, bool overwrite, string postBoundry)
+		public virtual HttpWebRequest GetUploadRequest(string path, bool overwrite, string postBoundary)
 		{
 			var url = new Uri($"{BaiduPanPcsUrl}/file?method=upload&app_id={PcsAppId}{(overwrite ? "&ondup=overwrite" : string.Empty)}&path={HttpUtility.UrlEncode(path)}");
 			var request = WebRequest.CreateHttp(url);
 			request.Method = "POST";
-			request.ContentType = "multipart/form-data; boundary=" + postBoundry;
+			request.ContentType = "multipart/form-data; boundary=" + postBoundary;
 			request.Headers.Add("Cookie", client.CookieContainer.GetCookieHeader(url));
 			return request;
 		}
