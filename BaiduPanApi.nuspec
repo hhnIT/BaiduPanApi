@@ -9,7 +9,10 @@
     <licenseUrl>https://github.com/HackingBaidu/BaiduPanApi/blob/v$version$/LICENSE</licenseUrl>
     <projectUrl>https://github.com/HackingBaidu/BaiduPanApi</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <releaseNotes>Add upload feature.
-Remove UserAgent header for some HTTP requests.</releaseNotes>
+    <releaseNotes>LoginTokenData was exposed by accident, it is now internal.
+Structs in BaiduPanApi.BaiduData changed to classes.
+CachedBaiduPanApi now allows refreshing cache for a specific item.
+Added IsUnknownError property to BaiduPanApiException.
+</releaseNotes>
   </metadata>
 </package>
