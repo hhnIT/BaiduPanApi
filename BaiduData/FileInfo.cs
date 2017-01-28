@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿#pragma warning disable 0649
+
+using Newtonsoft.Json;
 
 namespace BaiduPanApi.BaiduData
 {
