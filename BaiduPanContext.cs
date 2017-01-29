@@ -19,6 +19,7 @@ namespace BaiduPanApi
 			BaiduHomeUrl = "https://www.baidu.com",
 			BaiduPassportUrl = "https://passport.baidu.com",
 			BaiduLoginApiUrl = BaiduPassportUrl + "/v2/api",
+			BaiduCaptchaUrl = BaiduPassportUrl + "/cgi-bin/genimage",
 			BaiduPanHomeUrl = "https://pan.baidu.com",
 			BaiduPanApiUrl = BaiduPanHomeUrl + "/api",
 			BaiduPanPcsUrl = "https://pcs.baidu.com/rest/2.0/pcs",
@@ -26,6 +27,7 @@ namespace BaiduPanApi
 			LoginTokenRegex = "^" + TokenRegex + "$",
 			BdsTokenRegex = "\"bdstoken\":\"(" + TokenRegex + ")\"",
 			LoginErrorCodeRegex = "err_no=([0-9]+)",
+			CodeStringRegex = "codeString=([a-zA-Z0-9]+)",
 			CookieNotFoundErrorMessage = "Cound not find the cookie named \"{0}\".",
 			FormatErrorMessage = "Could not parse the response returned by the BaiduPan server.";
 
@@ -34,12 +36,12 @@ namespace BaiduPanApi
 		private readonly RestClient client;
 		private readonly string bdsToken;
 
-		public BaiduPanContext(string username, string password)
+		public BaiduPanContext(string username, string password, Func<byte[], string> captchaCallback)
 		{
 			var cookies = new CookieContainer();
 
 			GetBaiduId(cookies);
-			Login(username, password, GetLoginToken(cookies), cookies);
+			Login(username, password, GetLoginToken(cookies), captchaCallback, cookies);
 
 			bdsToken = GetBdsToken(cookies);
 			client = new RestClient(BaiduPanApiUrl) { CookieContainer = cookies };
@@ -110,7 +112,15 @@ namespace BaiduPanApi
 			return token;
 		}
 
-		private void Login(string username, string password, string token, CookieContainer cookies)
+		private byte[] GetCaptcha(string codeString, CookieContainer cookies)
+		{
+			var client = new RestClient(BaiduCaptchaUrl) { CookieContainer = cookies };
+			var response = client.Execute(new RestRequest($"?{codeString}"));
+			CheckResponseStatus(response);
+			return response.RawBytes;
+		}
+
+		private IRestResponse DoLoginRequest(string username, string password, string token, string captcha, CookieContainer cookies)
 		{
 			var client = new RestClient(BaiduLoginApiUrl) { CookieContainer = cookies };
 			var request = new RestRequest("?login", Method.POST);
@@ -119,11 +129,30 @@ namespace BaiduPanApi
 			request.AddParameter("username", username);
 			request.AddParameter("password", password);
 			request.AddParameter("token", token);
+			if (captcha != null) request.AddParameter("verifycode", captcha);
 			var response = client.Execute(request);
 			CheckResponseStatus(response);
-			var match = Regex.Match(response.Content, LoginErrorCodeRegex);
-			if (!match.Success) throw new FormatException(FormatErrorMessage);
-			var errorCode = int.Parse(match.Groups[1].Value);
+			return response;
+		}
+
+		private int GetLoginErrorCode(IRestResponse response)
+		{
+			var errorCodeMatch = Regex.Match(response.Content, LoginErrorCodeRegex);
+			if (!errorCodeMatch.Success) throw new FormatException(FormatErrorMessage);
+			return int.Parse(errorCodeMatch.Groups[1].Value);
+		}
+
+		private void Login(string username, string password, string token, Func<byte[], string> captchaCallback, CookieContainer cookies)
+		{
+			var response = DoLoginRequest(username, password, token, null, cookies);
+			var errorCode = GetLoginErrorCode(response);
+			if (errorCode == 257)
+			{
+				var codeStringMatch = Regex.Match(response.Content, CodeStringRegex);
+				if (!codeStringMatch.Success) throw new FormatException(FormatErrorMessage);
+				response = DoLoginRequest(username, password, token, captchaCallback(GetCaptcha(codeStringMatch.Value, cookies)), cookies);
+				errorCode = GetLoginErrorCode(response);
+			}
 			if (errorCode != 0 && errorCode != 18) throw new BaiduPanLoginException(errorCode);
 			CheckCookie(response, "BDUSS");
 		}
