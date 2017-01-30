@@ -58,11 +58,11 @@ namespace BaiduPanApi
 
 		#region Helpers
 
-		private void CheckResponseStatus(IRestResponse response)
+		private void CheckResponseStatus(IRestResponse response, bool allowPartialContent = false)
 		{
 			if (response.ResponseStatus != ResponseStatus.Completed)
 				throw response.ErrorException ?? response.ResponseStatus.ToWebException();
-			if (response.StatusCode != HttpStatusCode.OK)
+			if (response.StatusCode != HttpStatusCode.OK && (allowPartialContent ? response.StatusCode != HttpStatusCode.PartialContent : true))
 				throw new WebException(response.StatusDescription);
 		}
 
@@ -289,7 +289,7 @@ namespace BaiduPanApi
 			if (result.ErrorCode != 0) throw new BaiduPanApiException(result.ErrorCode);
 		}
 
-		public virtual IRestResponse DownloadFile(string path, Action<IRestRequest> beforeDownload, Action<Stream> processDownload)
+		public virtual void DownloadFile(string path, Action<IRestRequest> beforeDownload, Action<Stream> processDownload)
 		{
 			var client = new RestClient(BaiduPanPcsUrl) { CookieContainer = this.client.CookieContainer };
 			var request = new RestRequest("file");
@@ -298,10 +298,10 @@ namespace BaiduPanApi
 			request.AddParameter("path", path);
 			request.ResponseWriter = processDownload;
 			beforeDownload?.Invoke(request);
-			return client.Execute(request);
+			CheckResponseStatus(client.Execute(request), true);
 		}
 
-		public virtual IRestResponse UploadFile(string path, bool overwrite, long fileSize, Action<IRestRequest> beforeUpload, Action<Stream> processUpload)
+		public virtual void UploadFile(string path, bool overwrite, long fileSize, Action<IRestRequest> beforeUpload, Action<Stream> processUpload)
 		{
 			var client = new RestClient(BaiduPanPcsUrl) { UserAgent = ClientUserAgent, CookieContainer = this.client.CookieContainer };
 			var request = new RestRequest("file", Method.POST);
@@ -312,7 +312,7 @@ namespace BaiduPanApi
 			SplitPath(path, out var dir, out var name);
 			request.Files.Add(new FileParameter() { ContentLength = fileSize, FileName = name, Name = "file", Writer = processUpload });
 			beforeUpload?.Invoke(request);
-			return client.Execute(request);
+			CheckResponseStatus(client.Execute(request));
 		}
 
 		public virtual BaiduPanQuota GetQuota()
