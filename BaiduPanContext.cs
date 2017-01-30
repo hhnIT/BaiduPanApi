@@ -34,6 +34,7 @@ namespace BaiduPanApi
 
 		private readonly RestClient client;
 		private readonly string bdsToken;
+		private bool disposed;
 
 		public BaiduPanContext(string username, string password, Func<byte[], string> captchaCallback)
 		{
@@ -47,13 +48,16 @@ namespace BaiduPanApi
 			Username = username;
 		}
 
-		#region IDisposable
-
-		public void Dispose() { Logout(client.CookieContainer); }
+		public void Dispose()
+		{
+			if (!disposed)
+			{
+				disposed = true;
+				Logout(client.CookieContainer);
+			}
+		}
 
 		~BaiduPanContext() { Dispose(); }
-
-		#endregion
 
 		#region Helpers
 
