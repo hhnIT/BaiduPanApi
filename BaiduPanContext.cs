@@ -289,24 +289,30 @@ namespace BaiduPanApi
 			if (result.ErrorCode != 0) throw new BaiduPanApiException(result.ErrorCode);
 		}
 
-		public virtual HttpWebRequest GetDownloadRequest(string path)
+		public virtual IRestResponse DownloadFile(string path, Action<IRestRequest> beforeDownload, Action<Stream> processDownload)
 		{
-			var url = new Uri($"{BaiduPanPcsUrl}/file?method=download&app_id={PcsAppId}&path={HttpUtility.UrlEncode(path)}");
-			var request = WebRequest.CreateHttp(url);
-			request.Headers.Add("Cookie", client.CookieContainer.GetCookieHeader(url));
-			request.Headers.Add("Accept-Encoding", "gzip;deflate");
-			request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-			return request;
+			var client = new RestClient(BaiduPanPcsUrl) { CookieContainer = this.client.CookieContainer };
+			var request = new RestRequest("file");
+			request.AddParameter("method", "download");
+			request.AddParameter("app_id", PcsAppId);
+			request.AddParameter("path", path);
+			request.ResponseWriter = processDownload;
+			beforeDownload?.Invoke(request);
+			return client.Execute(request);
 		}
 
-		public virtual HttpWebRequest GetUploadRequest(string path, bool overwrite, string postBoundary)
+		public virtual IRestResponse UploadFile(string path, bool overwrite, long fileSize, Action<IRestRequest> beforeUpload, Action<Stream> processUpload)
 		{
-			var url = new Uri($"{BaiduPanPcsUrl}/file?method=upload&app_id={PcsAppId}{(overwrite ? "&ondup=overwrite" : string.Empty)}&path={HttpUtility.UrlEncode(path)}");
-			var request = WebRequest.CreateHttp(url);
-			request.Method = "POST";
-			request.ContentType = "multipart/form-data; boundary=" + postBoundary;
-			request.Headers.Add("Cookie", client.CookieContainer.GetCookieHeader(url));
-			return request;
+			var client = new RestClient(BaiduPanPcsUrl) { UserAgent = ClientUserAgent, CookieContainer = this.client.CookieContainer };
+			var request = new RestRequest("file", Method.POST);
+			request.AddQueryParameter("method", "upload");
+			request.AddQueryParameter("app_id", PcsAppId);
+			if (overwrite) request.AddQueryParameter("ondup", "overwrite");
+			request.AddQueryParameter("path", path);
+			SplitPath(path, out var dir, out var name);
+			request.Files.Add(new FileParameter() { ContentLength = fileSize, FileName = name, Name = "file", Writer = processUpload });
+			beforeUpload?.Invoke(request);
+			return client.Execute(request);
 		}
 
 		public virtual BaiduPanQuota GetQuota()
