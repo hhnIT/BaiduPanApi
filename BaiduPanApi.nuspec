@@ -9,10 +9,9 @@
     <licenseUrl>https://github.com/HackingBaidu/BaiduPanApi/blob/v$version$/LICENSE</licenseUrl>
     <projectUrl>https://github.com/HackingBaidu/BaiduPanApi</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <releaseNotes>LoginTokenData was exposed by accident, it is now internal.
-Structs in BaiduPanApi.BaiduData changed to classes.
-CachedBaiduPanApi now allows refreshing cache for a specific item.
-Added IsUnknownError property to BaiduPanApiException.
+    <releaseNotes>Add support for captchas when logging in.
+Add support for sliced upload.
+Download/upload interface updated.
 </releaseNotes>
   </metadata>
 </package>
