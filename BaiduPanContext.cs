@@ -75,6 +75,18 @@ namespace BaiduPanApi
 				throw new WebException(string.Format(CookieNotFoundErrorMessage, cookieName));
 		}
 
+		internal IRestResponse UploadFile(Action<IRestRequest> beforeUpload)
+		{
+			var client = new RestClient(BaiduPanPcsUrl) { CookieContainer = this.client.CookieContainer };
+			var request = new RestRequest("file", Method.POST);
+			request.AddQueryParameter("method", "upload");
+			request.AddQueryParameter("app_id", PcsAppId);
+			beforeUpload?.Invoke(request);
+			var response = client.Execute(request);
+			CheckResponseStatus(response);
+			return response;
+		}
+
 		private T ParseJson<T>(IRestResponse response)
 		{
 			try { return JsonConvert.DeserializeObject<T>(response.Content); }
@@ -292,7 +304,7 @@ namespace BaiduPanApi
 			if (result.ErrorCode != 0) throw new BaiduPanApiException(result.ErrorCode);
 		}
 
-		public virtual void DownloadFile(string path, Action<IRestRequest> beforeDownload, Action<Stream> processDownload)
+		public void DownloadFile(string path, Action<IRestRequest> beforeDownload, Action<Stream> processDownload)
 		{
 			var client = new RestClient(BaiduPanPcsUrl) { CookieContainer = this.client.CookieContainer };
 			var request = new RestRequest("file");
@@ -304,18 +316,50 @@ namespace BaiduPanApi
 			CheckResponseStatus(client.Execute(request), true);
 		}
 
-		public virtual void UploadFile(string path, bool overwrite, long fileSize, Action<IRestRequest> beforeUpload, Action<Stream> processUpload)
+		public void UploadFile(string path, long fileSize, bool overwrite, Action<IRestRequest> beforeUpload, Action<Stream> processUpload)
+			=> UploadFile(request =>
+			{
+				if (overwrite) request.AddQueryParameter("ondup", "overwrite");
+				request.AddQueryParameter("path", path);
+				SplitPath(path, out var dir, out var name);
+				request.Files.Add(new FileParameter()
+				{
+					ContentLength = fileSize,
+					FileName = name,
+					Name = "file",
+					Writer = processUpload
+				});
+				beforeUpload?.Invoke(request);
+			});
+
+		public string UploadFileSlice(long fileSize, Action<IRestRequest> beforeUpload, Action<Stream> processUpload)
 		{
-			var client = new RestClient(BaiduPanPcsUrl) { UserAgent = ClientUserAgent, CookieContainer = this.client.CookieContainer };
+			var result = ParseJson<BaiduData.UploadSliceResult>(UploadFile(request =>
+			{
+				request.AddQueryParameter("type", "tmpfile");
+				request.Files.Add(new FileParameter
+				{
+					ContentLength = fileSize,
+					Name = "file",
+					Writer = processUpload
+				});
+				beforeUpload?.Invoke(request);
+			}));
+			if (!Regex.IsMatch(result.Md5, $"^{Md5Regex}$")) throw new FormatException(FormatErrorMessage);
+			return result.Md5;
+		}
+
+		public void ConcatFileSlices(string path, bool overwrite, string[] slices)
+		{
+			var client = new RestClient(BaiduPanPcsUrl) { CookieContainer = this.client.CookieContainer };
 			var request = new RestRequest("file", Method.POST);
-			request.AddQueryParameter("method", "upload");
+			request.AddQueryParameter("method", "createsuperfile");
 			request.AddQueryParameter("app_id", PcsAppId);
 			if (overwrite) request.AddQueryParameter("ondup", "overwrite");
 			request.AddQueryParameter("path", path);
-			SplitPath(path, out var dir, out var name);
-			request.Files.Add(new FileParameter() { ContentLength = fileSize, FileName = name, Name = "file", Writer = processUpload });
-			beforeUpload?.Invoke(request);
-			CheckResponseStatus(client.Execute(request));
+			request.AddParameter("param", JsonConvert.SerializeObject(new BaiduData.ConcatFileSlicesParameter { FileList = slices }));
+			var response = client.Execute(request);
+			CheckResponseStatus(response);
 		}
 
 		public virtual BaiduPanQuota GetQuota()
