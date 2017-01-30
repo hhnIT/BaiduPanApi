@@ -13,7 +13,8 @@ namespace BaiduPanApi
 
 		public TimeSpan CacheTtl { get; }
 
-		public CachedBaiduPanContext(string username, string password, TimeSpan cacheTtl) : base(username, password)
+		public CachedBaiduPanContext(string username, string password, Func<byte[], string> captchaCallback, TimeSpan cacheTtl)
+			: base(username, password, captchaCallback)
 		{
 			cache = new MemoryCache(CacheNamePrefix + username);
 			CacheTtl = cacheTtl;
