@@ -23,9 +23,8 @@ namespace BaiduPanApi
 			BaiduPanHomeUrl = "https://pan.baidu.com",
 			BaiduPanApiUrl = BaiduPanHomeUrl + "/api",
 			BaiduPanPcsUrl = "https://pcs.baidu.com/rest/2.0/pcs",
-			TokenRegex = "[a-z0-9]{32}",
-			LoginTokenRegex = "^" + TokenRegex + "$",
-			BdsTokenRegex = "\"bdstoken\":\"(" + TokenRegex + ")\"",
+			Md5Regex = "[a-z0-9]{32}",
+			BdsTokenRegex = "\"bdstoken\":\"(" + Md5Regex + ")\"",
 			LoginErrorCodeRegex = "err_no=([0-9]+)",
 			CodeStringRegex = "codeString=([a-zA-Z0-9]+)",
 			CookieNotFoundErrorMessage = "Cound not find the cookie named \"{0}\".",
@@ -108,7 +107,7 @@ namespace BaiduPanApi
 			var result = ParseJson<BaiduData.LoginTokenResult>(response);
 			if (result.ErrorInfo.ErrorCode != 0) throw new BaiduPanLoginException(result.ErrorInfo.ErrorCode);
 			var token = result.Data.LoginToken;
-			if (!Regex.IsMatch(token, LoginTokenRegex)) throw new FormatException(FormatErrorMessage);
+			if (!Regex.IsMatch(token, $"^{Md5Regex}$")) throw new FormatException(FormatErrorMessage);
 			return token;
 		}
 
