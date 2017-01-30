@@ -146,7 +146,7 @@ namespace BaiduPanApi
 		{
 			var response = DoLoginRequest(username, password, token, null, cookies);
 			var errorCode = GetLoginErrorCode(response);
-			if (errorCode == 257)
+			if (errorCode == 257 && captchaCallback != null)
 			{
 				var codeStringMatch = Regex.Match(response.Content, CodeStringRegex);
 				if (!codeStringMatch.Success) throw new FormatException(FormatErrorMessage);
