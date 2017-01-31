@@ -8,10 +8,6 @@ install:
       Invoke-WebRequest -Uri "https://dotnet.myget.org/F/nuget-build/api/v2/package/NuGet.CommandLine" -OutFile "NuGet.nupkg"
       7z e "NuGet.nupkg" "tools\NuGet.exe"
       rm NuGet.nupkg
-assembly_info:
-  patch: true
-  file: Properties\AssemblyInfo.cs
-  assembly_informational_version: '{version}'
 configuration: Release
 build:
   project: BaiduPanApi.sln
@@ -26,6 +22,10 @@ after_build:
       md "$name"
       cp "bin\$Env:CONFIGURATION\*.dll" "$name"
       7z a "$name.zip" "$name"
+artifacts:
+  - path: '*.nupkg'
+  - path: '*.zip'
+
 deploy:
   - provider: GitHub
     artifact: /.*\.zip/
