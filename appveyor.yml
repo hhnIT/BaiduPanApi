@@ -1,0 +1,46 @@
+image: Visual Studio 2017 RC
+init:
+  - ps: |
+      if ($Env:APPVEYOR_REPO_TAG -eq "true") { Update-AppveyorBuild -Version "$Env:APPVEYOR_REPO_TAG_NAME" }
+      else { Update-AppveyorBuild -Version "dev-$($Env:APPVEYOR_REPO_COMMIT.Substring(0, 7))" }
+install:
+  - ps: |
+      Invoke-WebRequest -Uri "https://dotnet.myget.org/F/nuget-build/api/v2/package/NuGet.CommandLine" -OutFile "NuGet.nupkg"
+      7z e "NuGet.nupkg" "tools\NuGet.exe"
+      rm NuGet.nupkg
+assembly_info:
+  patch: true
+  file: Properties\AssemblyInfo.cs
+  assembly_informational_version: '{version}'
+configuration: Release
+build:
+  project: BaiduPanApi.sln
+  parallel: true
+  verbosity: normal
+before_build:
+  - ps: .\NuGet restore
+after_build:
+  - ps: if ($Env:APPVEYOR_REPO_TAG -eq "true") { .\NuGet pack -Prop Configuration=Release }
+  - ps: |
+      $name = "BaiduPanApi-$Env:APPVEYOR_BUILD_VERSION"
+      md "$name"
+      cp "bin\$Env:CONFIGURATION\*.dll" "$name"
+      7z a "$name.zip" "$name"
+deploy:
+  - provider: GitHub
+    artifact: /.*\.zip/
+    prerelease: true
+    description: |
+      **Release Notes**
+      - Add support for captchas when logging in.
+      - Add support for sliced upload.
+      - Download/upload interface updated.
+    auth_token:
+      secure: 5AlQWeRE8ygXF64hrS4Eix9lMiicAnetjiu9l91QHTb2Oao+gBnPHsIGdEh5GCvM
+    on:
+      appveyor_repo_tag: true
+  - provider: NuGet
+    api_key:
+      secure: ns4FQHCpiRJ4EfFSKpIMEHYX8H+kUVg7xsZWLXbI2yg17TLkjGPd/LrLQf3ZHD0B
+    on:
+      appveyor_repo_tag: true
