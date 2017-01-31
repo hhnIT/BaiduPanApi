@@ -12,7 +12,6 @@ configuration: Release
 build:
   project: BaiduPanApi.sln
   parallel: true
-  verbosity: normal
 before_build:
   - ps: .\NuGet restore
 after_build:
