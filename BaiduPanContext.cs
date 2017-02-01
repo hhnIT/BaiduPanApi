@@ -19,6 +19,7 @@ namespace BaiduPanApi
 			UploadContentType = "application/octet-stream",
 			UploadContentDisposition = "form-data",
 			UploadFileSliceMd5Header = "Content-MD5",
+			FileManagerParamName = "filelist",
 
 			BaiduHomeUrl = "https://www.baidu.com/",
 			BaiduPassportUrl = "https://passport.baidu.com/",
@@ -36,6 +37,7 @@ namespace BaiduPanApi
 			SearchUrl = "search?dir={0}&key={1}",
 			SearchRecursionUrl = SearchUrl + "&recursion",
 			DeleteUrl = "filemanager?opera=delete&bdstoken={0}",
+			CopyUrl = "filemanager?opera=copy&bdstoken={0}",
 			MoveUrl = "filemanager?opera=move&bdstoken={0}",
 			RenameUrl = "filemanager?opera=rename&bdstoken={0}",
 			CreateDirectoryUrl = "create?bdstoken={0}",
@@ -104,6 +106,20 @@ namespace BaiduPanApi
 
 		private static Uri GetUri(string template, params string[] values)
 			=> new Uri(string.Format(template, values.Select(WebUtility.UrlEncode).ToArray()), UriKind.Relative);
+
+		private async Task DoFileManagerRequest(string urlTemplate, object postData)
+		{
+			using (var content = new FormUrlEncodedContent(
+				new[] { new KeyValuePair<string, string>(FileManagerParamName, JsonConvert.SerializeObject(new[] { postData })) }))
+			using (var response = await client.PostAsync(GetUri(urlTemplate, bdsToken), content))
+			{
+				CheckResponseStatus(response);
+				var result = await ParseJsonAsync<BaiduData.FileManagerResult>(response);
+				var errorCode = result.ResultList.First().ErrorCode;
+				if (errorCode != 0) throw new BaiduPanApiException(errorCode);
+				if (result.ErrorCode != 0) throw new BaiduPanApiException(result.ErrorCode);
+			}
+		}
 
 		protected static void SplitPath(string path, out string dir, out string name)
 		{
@@ -278,62 +294,22 @@ namespace BaiduPanApi
 		}
 
 		public virtual async Task DeleteItemAsync(string path)
-		{
-			using (var content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("filelist", JsonConvert.SerializeObject(new[] { path })) }))
-			using (var response = await client.PostAsync(GetUri(DeleteUrl, bdsToken), content))
-			{
-				CheckResponseStatus(response);
-				var result = await ParseJsonAsync<BaiduData.FileManagerResult>(response);
-				var errorCode = result.ResultList.First().ErrorCode;
-				if (errorCode != 0) throw new BaiduPanApiException(errorCode);
-				if (result.ErrorCode != 0) throw new BaiduPanApiException(result.ErrorCode);
-			}
-		}
+			=> await DoFileManagerRequest(DeleteUrl, path);
 
 		public virtual async Task MoveItemAsync(string path, string dest, string newName)
-		{
-			using (var content = new FormUrlEncodedContent(new[]
+			=> await DoFileManagerRequest(MoveUrl, new
 			{
-				new KeyValuePair<string, string>("filelist", JsonConvert.SerializeObject(new[]
-				{
-					new {
-						path = path,
-						dest = dest,
-						newname = newName
-					}
-				}))
-			}))
-			using (var response = await client.PostAsync(GetUri(MoveUrl, bdsToken), content))
-			{
-				CheckResponseStatus(response);
-				var result = await ParseJsonAsync<BaiduData.FileManagerResult>(response);
-				var errorCode = result.ResultList.First().ErrorCode;
-				if (errorCode != 0) throw new BaiduPanApiException(errorCode);
-				if (result.ErrorCode != 0) throw new BaiduPanApiException(result.ErrorCode);
-			}
-		}
+				path = path,
+				dest = dest,
+				newname = newName
+			});
 
 		public virtual async Task RenameItemAsync(string path, string newName)
-		{
-			using (var content = new FormUrlEncodedContent(new[]
+			=> await DoFileManagerRequest(RenameUrl, new
 			{
-				new KeyValuePair<string, string>("filelist", JsonConvert.SerializeObject(new[]
-				{
-					new {
-						path = path,
-						newname = newName
-					}
-				}))
-			}))
-			using (var response = await client.PostAsync(GetUri(RenameUrl, bdsToken), content))
-			{
-				CheckResponseStatus(response);
-				var result = await ParseJsonAsync<BaiduData.FileManagerResult>(response);
-				var errorCode = result.ResultList.First().ErrorCode;
-				if (errorCode != 0) throw new BaiduPanApiException(errorCode);
-				if (result.ErrorCode != 0) throw new BaiduPanApiException(result.ErrorCode);
-			}
-		}
+				path = path,
+				newname = newName
+			});
 
 		public virtual async Task CreateDirectoryAsync(string path)
 		{
