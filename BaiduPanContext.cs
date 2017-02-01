@@ -296,6 +296,14 @@ namespace BaiduPanApi
 		public virtual async Task DeleteItemAsync(string path)
 			=> await DoFileManagerRequest(DeleteUrl, path);
 
+		public virtual async Task CopyItemAsync(string path, string dest, string newName)
+			=> await DoFileManagerRequest(CopyUrl, new
+			{
+				path = path,
+				dest = dest,
+				newname = newName
+			});
+
 		public virtual async Task MoveItemAsync(string path, string dest, string newName)
 			=> await DoFileManagerRequest(MoveUrl, new
 			{
