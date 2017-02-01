@@ -283,7 +283,9 @@ namespace BaiduPanApi
 			using (var response = await client.PostAsync(GetUri(DeleteUrl, bdsToken), content))
 			{
 				CheckResponseStatus(response);
-				var result = await ParseJsonAsync<BaiduData.ApiResult>(response);
+				var result = await ParseJsonAsync<BaiduData.FileManagerResult>(response);
+				var errorCode = result.ResultList.First().ErrorCode;
+				if (errorCode != 0) throw new BaiduPanApiException(errorCode);
 				if (result.ErrorCode != 0) throw new BaiduPanApiException(result.ErrorCode);
 			}
 		}
@@ -304,7 +306,9 @@ namespace BaiduPanApi
 			using (var response = await client.PostAsync(GetUri(MoveUrl, bdsToken), content))
 			{
 				CheckResponseStatus(response);
-				var result = await ParseJsonAsync<BaiduData.ApiResult>(response);
+				var result = await ParseJsonAsync<BaiduData.FileManagerResult>(response);
+				var errorCode = result.ResultList.First().ErrorCode;
+				if (errorCode != 0) throw new BaiduPanApiException(errorCode);
 				if (result.ErrorCode != 0) throw new BaiduPanApiException(result.ErrorCode);
 			}
 		}
@@ -324,7 +328,9 @@ namespace BaiduPanApi
 			using (var response = await client.PostAsync(GetUri(RenameUrl, bdsToken), content))
 			{
 				CheckResponseStatus(response);
-				var result = await ParseJsonAsync<BaiduData.ApiResult>(response);
+				var result = await ParseJsonAsync<BaiduData.FileManagerResult>(response);
+				var errorCode = result.ResultList.First().ErrorCode;
+				if (errorCode != 0) throw new BaiduPanApiException(errorCode);
 				if (result.ErrorCode != 0) throw new BaiduPanApiException(result.ErrorCode);
 			}
 		}

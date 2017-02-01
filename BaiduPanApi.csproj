@@ -40,6 +40,7 @@
   <ItemGroup>
     <Compile Include="BaiduData\ApiResult.cs" />
     <Compile Include="BaiduData\ConcatFileSlicesParameter.cs" />
+    <Compile Include="BaiduData\FileManagerResult.cs" />
     <Compile Include="BaiduData\QuotaResult.cs" />
     <Compile Include="BaiduPanContext.cs" />
     <Compile Include="BaiduPanApiException.cs" />
