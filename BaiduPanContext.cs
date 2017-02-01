@@ -394,7 +394,7 @@ namespace BaiduPanApi
 			using (var response = await client.PostAsync(GetUri(UploadFileSliceUrl, PcsAppId), content))
 			{
 				CheckResponseStatus(response);
-				var md5 = response.Content.Headers.GetValues("Content-MD5").First();
+				var md5 = response.Content.Headers.GetValues(UploadFileSliceMd5Header).First();
 				if (!Regex.IsMatch(md5, $"^{Hex128BitRegex}$")) throw new FormatException(FormatErrorMessage);
 				return md5;
 			}
