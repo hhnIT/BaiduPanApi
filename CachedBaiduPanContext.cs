@@ -42,13 +42,13 @@ namespace BaiduPanApi
 				cache.Remove(key);
 		}
 
-		public void RefreshCache()
+		public void ClearCache()
 		{
 			cache.Dispose();
 			cache = new MemoryCache(CacheNamePrefix + Username);
 		}
 
-		public void RefreshCache(string path) => RemoveCacheByPrefixes(path + "$");
+		public void ClearCache(string path) => RemoveCacheByPrefixes(path + "$");
 
 		public override async Task<BaiduPanQuota> GetQuotaAsync()
 			=> await GetDataAsync(nameof(GetQuotaAsync), base.GetQuotaAsync);
@@ -67,6 +67,13 @@ namespace BaiduPanApi
 			await base.DeleteItemAsync(path);
 			SplitPath(path, out var dir, out var name);
 			RemoveCacheByPrefixes(dir + "$", path + "/", path + "$");
+		}
+
+		public override async Task CopyItemAsync(string path, string dest, string newName)
+		{
+			await base.CopyItemAsync(path, dest, newName);
+			var newPath = $"{(dest == "/" ? string.Empty : dest)}/{newName}";
+			RemoveCacheByPrefixes(dest + "$", newPath + "$", newPath + "/");
 		}
 
 		public override async Task MoveItemAsync(string path, string dest, string newName)
