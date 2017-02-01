@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.Caching;
+using System.Threading.Tasks;
 
 namespace BaiduPanApi
 {
@@ -20,11 +22,17 @@ namespace BaiduPanApi
 			CacheTtl = cacheTtl;
 		}
 
-		private T GetData<T>(string key, Func<T> valueFunc)
+		protected override async Task DisposeAsync()
 		{
-			var value = new Lazy<T>(valueFunc);
-			var res = cache.AddOrGetExisting(key, value, DateTimeOffset.Now + CacheTtl) as Lazy<T>;
-			return res != null ? res.Value : value.Value;
+			await base.DisposeAsync();
+			cache.Dispose();
+		}
+
+		private async Task<T> GetDataAsync<T>(string key, Func<Task<T>> valueFunc)
+		{
+			var value = new Lazy<Task<T>>(valueFunc);
+			var res = cache.AddOrGetExisting(key, value, DateTimeOffset.Now + CacheTtl) as Lazy<Task<T>>;
+			return await (res != null ? res.Value : value.Value);
 		}
 
 		private void RemoveCacheByPrefixes(params string[] prefixes)
@@ -42,46 +50,60 @@ namespace BaiduPanApi
 
 		public void RefreshCache(string path) => RemoveCacheByPrefixes(path + "$");
 
-		public override IEnumerable<BaiduPanFileInformation> ListDirectory(string path)
-			=> GetData($"{path}${nameof(ListDirectory)}", () => base.ListDirectory(path));
+		public override async Task<BaiduPanQuota> GetQuotaAsync()
+			=> await GetDataAsync(nameof(GetQuotaAsync), base.GetQuotaAsync);
+		
+		public override async Task<IEnumerable<BaiduPanFileInformation>> ListDirectoryAsync(string path)
+			=> await GetDataAsync($"{path}${nameof(ListDirectoryAsync)}", () => base.ListDirectoryAsync(path));
 
-		public override BaiduPanFileInformation GetItemInformation(string path)
-			=> GetData($"{path}${nameof(GetItemInformation)}", () => base.GetItemInformation(path));
+		public override async Task<BaiduPanFileInformation> GetItemInformationAsync(string path)
+			=> await GetDataAsync($"{path}${nameof(GetItemInformationAsync)}", () => base.GetItemInformationAsync(path));
 
-		public override IEnumerable<BaiduPanFileInformation> Search(string path, string key, bool recursive)
-			=> base.Search(path, key, recursive);
+		public override async Task<IEnumerable<BaiduPanFileInformation>> SearchAsync(string path, string key, bool recursive)
+			=> await base.SearchAsync(path, key, recursive);
 
-		public override BaiduPanQuota GetQuota()
-			=> GetData(nameof(GetQuota), base.GetQuota);
-
-		public override void DeleteItem(string path)
+		public override async Task DeleteItemAsync(string path)
 		{
-			base.DeleteItem(path);
+			await base.DeleteItemAsync(path);
 			SplitPath(path, out var dir, out var name);
 			RemoveCacheByPrefixes(dir + "$", path + "/", path + "$");
 		}
 
-		public override void MoveItem(string path, string dest, string newName)
+		public override async Task MoveItemAsync(string path, string dest, string newName)
 		{
-			base.MoveItem(path, dest, newName);
+			await base.MoveItemAsync(path, dest, newName);
 			SplitPath(path, out var dir, out var name);
 			var newPath = $"{(dest == "/" ? string.Empty : dest)}/{newName}";
 			RemoveCacheByPrefixes(dir + "$", path + "/", path + "$", dest + "$", newPath + "$", newPath + "/");
 		}
 
-		public override void RenameItem(string path, string newName)
+		public override async Task RenameItemAsync(string path, string newName)
 		{
-			base.RenameItem(path, newName);
+			await base.RenameItemAsync(path, newName);
 			SplitPath(path, out var dir, out var name);
 			var newPath = $"{(dir == "/" ? string.Empty : dir)}/{newName}";
 			RemoveCacheByPrefixes(dir + "$", path + "/", path + "$", newPath + "$", newPath + "/");
 		}
 
-		public override void CreateDirectory(string path)
+		public override async Task CreateDirectoryAsync(string path)
 		{
-			base.CreateDirectory(path);
+			await base.CreateDirectoryAsync(path);
 			SplitPath(path, out var dir, out var name);
 			RemoveCacheByPrefixes(dir + "$", path + "/", path + "$");
+		}
+
+		public override async Task UploadFileAsync(string path, bool overwrite, HttpContent data)
+		{
+			await base.UploadFileAsync(path, overwrite, data);
+			SplitPath(path, out var dir, out var name);
+			RemoveCacheByPrefixes(dir + "$", path + "$");
+		}
+
+		public override async Task ConcatFileSlicesAsync(string path, bool overwrite, string[] slices)
+		{
+			await base.ConcatFileSlicesAsync(path, overwrite, slices);
+			SplitPath(path, out var dir, out var name);
+			RemoveCacheByPrefixes(dir + "$", path + "$");
 		}
 	}
 }
