@@ -44,7 +44,7 @@ namespace BaiduPanApi
 			UploadFileOverwriteUrl = "file?method=upload&ondup=overwrite&app_id={0}&path={1}",
 			UploadFileSliceUrl = "file?method=upload&type=tmpfile&app_id={0}",
 			ConcatFileSlicesUrl = "file?method=createsuperfile&app_id={0}&path={1}",
-			ConcatFileSlicesOverwriteUrl = ConcatFileSlicesUrl + "&ondup=overwirte",
+			ConcatFileSlicesOverwriteUrl = ConcatFileSlicesUrl + "&ondup=overwrite",
 
 			Hex128BitRegex = "[a-z0-9]{32}",
 			BdsTokenRegex = "\"bdstoken\":\"(" + Hex128BitRegex + ")\"",
@@ -378,7 +378,11 @@ namespace BaiduPanApi
 		public virtual async Task<string> UploadFileSliceAsync(HttpContent data)
 		{
 			data.Headers.ContentType = new MediaTypeHeaderValue(UploadContentType);
-			data.Headers.ContentDisposition = new ContentDispositionHeaderValue(UploadContentDisposition) { Name = "file" };
+			data.Headers.ContentDisposition = new ContentDispositionHeaderValue(UploadContentDisposition)
+			{
+				Name = "file",
+				FileName = "foo"
+			};
 			using (var client = new HttpClient(handler, false) { BaseAddress = new Uri(BaiduPanPcsUrl) })
 			using (var content = new MultipartFormDataContent { data })
 			using (var response = await client.PostAsync(GetUri(UploadFileSliceUrl, PcsAppId), content))
