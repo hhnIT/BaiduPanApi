@@ -9,14 +9,6 @@
     <licenseUrl>https://github.com/HackingBaidu/BaiduPanApi/blob/v$version$/LICENSE</licenseUrl>
     <projectUrl>https://github.com/HackingBaidu/BaiduPanApi</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <releaseNotes>Migrate to use System.Net.Http.HttpClient as the underlying HTTP library.
-Almost all public methods are changed to use "async" and added an "Async" suffix.
-Add support for copying.
-Cookies checking on login is removed.
-Cache is now disposed in CachedBaiduPanContent.Dispose().
-Corresponding cache entries will be cleared after uploading files in CachedBaiduPanContent.
-DeleteItemAsync(), MoveItemAsync() and RenameItemAsync() now give correct error codes.
-The IsUnknownError property of BaiduPanApiException and BaiduPanLoginException now returns correct value.
-</releaseNotes>
+    <releaseNotes>https://github.com/HackingBaidu/BaiduPanApi/releases/tag/v$version$</releaseNotes>
   </metadata>
 </package>
