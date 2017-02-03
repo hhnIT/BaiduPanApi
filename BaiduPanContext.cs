@@ -66,11 +66,15 @@ namespace BaiduPanApi
 		public BaiduPanContext(string username, string password, Func<byte[], string> captchaCallback)
 		{
 			handler = new HttpClientHandler { CookieContainer = new CookieContainer() };
-			GetBaiduIdAsync().Wait();
-			LoginAsync(username, password, GetLoginTokenAsync().Result, captchaCallback).Wait();
-			bdsToken = GetBdsTokenAsync().Result;
 			Username = username;
 			client = new HttpClient(handler) { BaseAddress = new Uri(BaiduPanApiUrl) };
+			try
+			{
+				GetBaiduIdAsync().Wait();
+				LoginAsync(username, password, GetLoginTokenAsync().Result, captchaCallback).Wait();
+				bdsToken = GetBdsTokenAsync().Result;
+			}
+			catch (AggregateException ex) { throw ex.InnerException; }
 		}
 
 		protected virtual async Task DisposeAsync()
@@ -84,7 +88,8 @@ namespace BaiduPanApi
 			if (!disposed)
 			{
 				disposed = true;
-				DisposeAsync().Wait();
+				try { DisposeAsync().Wait(); }
+				catch (AggregateException ex) { throw ex.InnerException; }
 			}
 		}
 
