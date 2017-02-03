@@ -340,7 +340,7 @@ namespace BaiduPanApi
 		/// </summary>
 		/// <param name="path">The directory to search inside.</param>
 		/// <param name="key">The keyword to search.</param>
-		/// <param name="recursive"><c>true</c> for searching also in subdirectories.</param>
+		/// <param name="recursive">Specifies whether to search also in subdirectories.</param>
 		/// <returns>Information about all of the matched files and directories.</returns>
 		public virtual async Task<IEnumerable<BaiduPanFileInformation>> SearchAsync(string path, string key, bool recursive)
 		{
@@ -465,7 +465,7 @@ namespace BaiduPanApi
 		/// Uploads a file.
 		/// </summary>
 		/// <param name="path">The location to store the uploaded file.</param>
-		/// <param name="overwrite"><c>true</c> for overwriting any existing file.</param>
+		/// <param name="overwrite">Specifies whether to overwrite any existing file.</param>
 		/// <param name="data">The data to be uploaded.</param>
 		/// <remarks>
 		/// <para>This method can upload 2GB data at most.</para>
@@ -519,7 +519,7 @@ namespace BaiduPanApi
 		/// Concatenates uploaded file slices uploaded by <see cref="UploadFileSliceAsync" /> to a complete file.
 		/// </summary>
 		/// <param name="path">The location to store the concatenated file.</param>
-		/// <param name="overwrite"><c>true</c> for overwriting any existing file.</param>
+		/// <param name="overwrite">Specifies whether to overwrite any existing file.</param>
 		/// <param name="slices">MD5 hash list of the slices to be concatenated.</param>
 		/// <remarks>
 		/// <paramref name="slices" /> is the list of MD5 hash values returned by <see cref="UploadFileSliceAsync" />,
