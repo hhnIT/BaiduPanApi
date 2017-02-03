@@ -166,7 +166,7 @@ namespace BaiduPanApi
 			}
 		}
 
-		private async Task<string> DoLoginRequestAsync(string username, string password, string token, string captcha)
+		private async Task<string> DoLoginRequestAsync(string username, string password, string token, string codeString, string captcha)
 		{
 			using (var client = new HttpClient(handler, false) { BaseAddress = new Uri(BaiduLoginApiUrl) })
 			{
@@ -178,6 +178,7 @@ namespace BaiduPanApi
 					{ "password", password },
 					{ "token", token }
 				};
+				if (codeString != null) paramDict.Add("codestring", codeString);
 				if (captcha != null) paramDict.Add("verifycode", captcha);
 				using (var content = new FormUrlEncodedContent(paramDict))
 				using (var response = await client.PostAsync(GetUri(LoginUrl), content))
@@ -197,13 +198,14 @@ namespace BaiduPanApi
 
 		private async Task LoginAsync(string username, string password, string token, Func<byte[], string> captchaCallback)
 		{
-			var result = await DoLoginRequestAsync(username, password, token, null);
+			var result = await DoLoginRequestAsync(username, password, token, null, null);
 			var errorCode = GetLoginErrorCodeAsync(result);
 			if (errorCode == 257 && captchaCallback != null)
 			{
 				var codeStringMatch = Regex.Match(result, CodeStringRegex);
 				if (!codeStringMatch.Success) throw new FormatException(FormatErrorMessage);
-				result = await DoLoginRequestAsync(username, password, token, captchaCallback(await GetCaptchaAsync(codeStringMatch.Value)));
+				var codeString = codeStringMatch.Groups[1].Value;
+				result = await DoLoginRequestAsync(username, password, token, codeString, captchaCallback(await GetCaptchaAsync(codeString)));
 				errorCode = GetLoginErrorCodeAsync(result);
 			}
 			if (errorCode != 0 && errorCode != 18) throw new BaiduPanLoginException(errorCode);
