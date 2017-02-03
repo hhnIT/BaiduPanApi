@@ -112,7 +112,7 @@ namespace BaiduPanApi
 		}
 
 		/// <summary>
-		/// Logs out the current account and releases any unmanaged resource.
+		/// Logs out the current account and releases any unmanaged resources.
 		/// </summary>
 		public void Dispose()
 		{
@@ -125,7 +125,7 @@ namespace BaiduPanApi
 		}
 
 		/// <summary>
-		/// Logs out the current account and releases any unmanaged resource.
+		/// Logs out the current account and releases any unmanaged resources.
 		/// </summary>
 		~BaiduPanContext() { Dispose(); }
 
@@ -342,6 +342,7 @@ namespace BaiduPanApi
 		/// <param name="key">The keyword to search.</param>
 		/// <param name="recursive">Specifies whether to search also in subdirectories.</param>
 		/// <returns>Information about all of the matched files and directories.</returns>
+		/// <remarks>This method won't throw exceptions even when <paramref name="path" /> doesn't exist.</remarks>
 		public virtual async Task<IEnumerable<BaiduPanFileInformation>> SearchAsync(string path, string key, bool recursive)
 		{
 			using (var response = await client.GetAsync(GetUri(recursive ? SearchRecursionUrl : SearchUrl, path, key)))
@@ -465,10 +466,11 @@ namespace BaiduPanApi
 		/// Uploads a file.
 		/// </summary>
 		/// <param name="path">The location to store the uploaded file.</param>
-		/// <param name="overwrite">Specifies whether to overwrite any existing file.</param>
+		/// <param name="overwrite">Specifies whether to overwrite any existing files.</param>
 		/// <param name="data">The data to be uploaded.</param>
 		/// <remarks>
 		/// <para>This method can upload 2GB data at most.</para>
+		/// <para>This method will create directories recursively if part of <paramref name="path" /> doesn't exist.</para>
 		/// <para>Whether the uploaded data is buffered depends on whether the length of <paramref name="data" /> is determined.</para>
 		/// </remarks>
 		public virtual async Task UploadFileAsync(string path, bool overwrite, HttpContent data)
@@ -494,6 +496,7 @@ namespace BaiduPanApi
 		/// <remarks>
 		/// <para>This method can upload 2GB data at most.</para>
 		/// <para>The uploaded slices can be concatenated to a complete file using <see cref="ConcatFileSlicesAsync" />.</para>
+		/// <para>Whether the uploaded data is buffered depends on whether the length of <paramref name="data" /> is determined.</para>
 		/// </remarks>
 		/// <seealso cref="UploadFileAsync" />
 		public virtual async Task<string> UploadFileSliceAsync(HttpContent data)
@@ -519,11 +522,14 @@ namespace BaiduPanApi
 		/// Concatenates uploaded file slices uploaded by <see cref="UploadFileSliceAsync" /> to a complete file.
 		/// </summary>
 		/// <param name="path">The location to store the concatenated file.</param>
-		/// <param name="overwrite">Specifies whether to overwrite any existing file.</param>
+		/// <param name="overwrite">Specifies whether to overwrite any existing files.</param>
 		/// <param name="slices">MD5 hash list of the slices to be concatenated.</param>
 		/// <remarks>
+		/// <para>This method will create directories recursively if part of <paramref name="path" /> doesn't exist.</para>
+		/// <para>
 		/// <paramref name="slices" /> is the list of MD5 hash values returned by <see cref="UploadFileSliceAsync" />,
 		/// it should contain at least two elements.
+		/// </para>
 		/// </remarks>
 		public virtual async Task ConcatFileSlicesAsync(string path, bool overwrite, string[] slices)
 		{
