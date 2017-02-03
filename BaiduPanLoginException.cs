@@ -4,7 +4,7 @@ namespace BaiduPanApi
 {
 	class BaiduPanLoginException : BaiduPanApiException
 	{
-		protected override Dictionary<int, string> ErrorMessages { get; } = new Dictionary<int, string>
+		internal override Dictionary<int, string> ErrorMessages { get; } = new Dictionary<int, string>
 		{
 			{ 1, "您输入的帐号格式不正确" },
 			{ 2, "您输入的帐号不存在" },

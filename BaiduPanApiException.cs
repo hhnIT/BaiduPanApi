@@ -3,9 +3,12 @@ using System.Collections.Generic;
 
 namespace BaiduPanApi
 {
+	/// <summary>
+	/// Represents a error returned by the Baidu servers.
+	/// </summary>
 	public class BaiduPanApiException : Exception
 	{
-		protected virtual Dictionary<int, string> ErrorMessages { get; } = new Dictionary<int, string>
+		internal virtual Dictionary<int, string> ErrorMessages { get; } = new Dictionary<int, string>
 		{
 			{ 0, "成功" },
 			{ 1, "服务器错误 " },
@@ -79,10 +82,30 @@ namespace BaiduPanApi
 			{ -32, "你的空间不足了哟" }
 		};
 
+		/// <summary>
+		/// Gets the error code of the error.
+		/// </summary>
+		/// <value>The error code of the error.</value>
 		public int ErrorCode { get; }
+
+		/// <summary>
+		/// Gets whether this error is unknown.
+		/// </summary>
+		/// <value><c>true</c> if this error is unknown.</value>
+		/// <remarks>
+		/// An error is considered unknown if Baidu doesn't provide an error message for its error code.
+		/// </remarks>
 		public bool IsUnknownError => !ErrorMessages.ContainsKey(ErrorCode);
+
+		/// <summary>
+		/// The error message corresponds to <see cref="ErrorCode" />.
+		/// </summary>
 		public override string Message => ErrorMessages.TryGetValue(ErrorCode, out var msg) ? msg : "Unknown error";
 
+		/// <summary>
+		/// Creates an instance of <see cref="BaiduPanApiException" />.
+		/// </summary>
+		/// <param name="errorCode">The error code of the error.</param>
 		public BaiduPanApiException(int errorCode) { ErrorCode = errorCode; }
 	}
 }

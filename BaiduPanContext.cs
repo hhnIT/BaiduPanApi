@@ -11,6 +11,13 @@ using Newtonsoft.Json;
 
 namespace BaiduPanApi
 {
+	/// <summary>
+	/// Represents a logged in session of BaiduPan.
+	/// </summary>
+	/// <remarks>
+	/// <para>Use this class to manipulate the BaiduPan assosiated with the logged in account.</para>
+	/// <para>All paths passed in should <c>/</c> as the delimiter and should start with a <c>/</c>.</para>
+	/// </remarks>
 	public class BaiduPanContext : IDisposable
 	{
 		private const string
@@ -56,6 +63,10 @@ namespace BaiduPanApi
 			CookieNotFoundErrorMessage = "Cound not find the cookie named \"{0}\".",
 			FormatErrorMessage = "Could not parse the response returned by the BaiduPan server.";
 
+		/// <summary>
+		/// Gets the username of the logged in user.
+		/// </summary>
+		/// <value>Username of the logged in user.</value>
 		public string Username { get; }
 
 		private readonly HttpClient client;
@@ -63,6 +74,16 @@ namespace BaiduPanApi
 		private readonly string bdsToken;
 		private bool disposed;
 
+		/// <summary>
+		/// Creates an instance of <see cref="BaiduPanContext" />.
+		/// </summary>
+		/// <param name="username">The username.</param>
+		/// <param name="password">The password.</param>
+		/// <param name="captchaCallback">The callback that will be invoked when a captcha is required.</param>
+		/// <remarks>
+		/// When a captcha is required by the Baidu servers, <paramref name="captchaCallback" /> will be invoked
+		/// with the binary data of the captcha image, it should then return the text in the captcha image.
+		/// </remarks>
 		public BaiduPanContext(string username, string password, Func<byte[], string> captchaCallback)
 		{
 			handler = new HttpClientHandler { CookieContainer = new CookieContainer() };
@@ -77,12 +98,22 @@ namespace BaiduPanApi
 			catch (AggregateException ex) { throw ex.InnerException; }
 		}
 
+		/// <summary>
+		/// An internal helper for calling async methods in <see cref="Dispose" />.
+		/// </summary>
+		/// <remarks>
+		/// <para>This method will be called in <see cref="Dispose" />.</para>
+		/// <para>Override this method to release resources in <see cref="Dispose" />.</para>
+		/// </remarks>
 		protected virtual async Task DisposeAsync()
 		{
 			await LogoutAsync();
 			client.Dispose();
 		}
 
+		/// <summary>
+		/// Logs out the current account and releases any unmanaged resource.
+		/// </summary>
 		public void Dispose()
 		{
 			if (!disposed)
@@ -93,6 +124,9 @@ namespace BaiduPanApi
 			}
 		}
 
+		/// <summary>
+		/// Logs out the current account and releases any unmanaged resource.
+		/// </summary>
 		~BaiduPanContext() { Dispose(); }
 
 		#region Helpers
@@ -126,6 +160,12 @@ namespace BaiduPanApi
 			}
 		}
 
+		/// <summary>
+		/// Splits a path into a directory path and a file name.
+		/// </summary>
+		/// <param name="path">The path to be processed.</param>
+		/// <param name="dir">The directory path of <paramref name="path" />.</param>
+		/// <param name="name">The file name of <paramref name="path" />.</param>
 		protected static void SplitPath(string path, out string dir, out string name)
 		{
 			var index = path.LastIndexOf('/');
@@ -238,6 +278,10 @@ namespace BaiduPanApi
 
 		#region Operations
 
+		/// <summary>
+		/// Gets quota information of the BaiduPan.
+		/// </summary>
+		/// <returns>Quota information of the BaiduPan.</returns>
 		public virtual async Task<BaiduPanQuota> GetQuotaAsync()
 		{
 			using (var response = await client.GetAsync(GetUri("quota")))
@@ -254,6 +298,11 @@ namespace BaiduPanApi
 			}
 		}
 
+		/// <summary>
+		/// Gets all files and directories contained in a directory.
+		/// </summary>
+		/// <param name="path">The directory to list.</param>
+		/// <returns>All files and directories contained in <paramref name="path" />.</returns>
 		public virtual async Task<IEnumerable<BaiduPanFileInformation>> ListDirectoryAsync(string path)
 		{
 			using (var response = await client.GetAsync(GetUri(ListDirectoryUrl, path)))
@@ -274,6 +323,11 @@ namespace BaiduPanApi
 			}
 		}
 
+		/// <summary>
+		/// Gets information about a file or a directory.
+		/// </summary>
+		/// <param name="path">The directory to get information about.</param>
+		/// <returns>Information about <paramref name="path" />.</returns>
 		public virtual async Task<BaiduPanFileInformation> GetItemInformationAsync(string path)
 		{
 			SplitPath(path, out var dir, out var name);
@@ -281,6 +335,13 @@ namespace BaiduPanApi
 			catch (InvalidOperationException ex) { throw new FileNotFoundException(string.Empty, ex); }
 		}
 
+		/// <summary>
+		/// Searches files and directories in a directory.
+		/// </summary>
+		/// <param name="path">The directory to search inside.</param>
+		/// <param name="key">The keyword to search.</param>
+		/// <param name="recursive"><c>true</c> for searching also in subdirectories.</param>
+		/// <returns>Information about all of the matched files and directories.</returns>
 		public virtual async Task<IEnumerable<BaiduPanFileInformation>> SearchAsync(string path, string key, bool recursive)
 		{
 			using (var response = await client.GetAsync(GetUri(recursive ? SearchRecursionUrl : SearchUrl, path, key)))
@@ -300,9 +361,20 @@ namespace BaiduPanApi
 			}
 		}
 
+		/// <summary>
+		/// Deletes a file or a directory.
+		/// </summary>
+		/// <param name="path">The file or directory to delete.</param>
+		/// <remarks>This method won't throw exceptions even when <paramref name="path" /> doesn't exist.</remarks>
 		public virtual async Task DeleteItemAsync(string path)
 			=> await DoFileManagerRequest(DeleteUrl, path);
 
+		/// <summary>
+		/// Copys a file or a directory.
+		/// </summary>
+		/// <param name="path">The file or directory to copy.</param>
+		/// <param name="dest">The destination directory to copy to.</param>
+		/// <param name="newName">The name of the new file or directory.</param>
 		public virtual async Task CopyItemAsync(string path, string dest, string newName)
 			=> await DoFileManagerRequest(CopyUrl, new
 			{
@@ -311,6 +383,13 @@ namespace BaiduPanApi
 				newname = newName
 			});
 
+		/// <summary>
+		/// Moves a file or a directory.
+		/// </summary>
+		/// <param name="path">The file or directory to move.</param>
+		/// <param name="dest">The destination directory to move to.</param>
+		/// <param name="newName">The name of the new file or directory.</param>
+		/// <remarks>This method will throw an exception when the destination path equals to the source path.</remarks>
 		public virtual async Task MoveItemAsync(string path, string dest, string newName)
 			=> await DoFileManagerRequest(MoveUrl, new
 			{
@@ -319,6 +398,12 @@ namespace BaiduPanApi
 				newname = newName
 			});
 
+		/// <summary>
+		/// Renames a file or a directory.
+		/// </summary>
+		/// <param name="path">The file or directory to rename.</param>
+		/// <param name="newName">The name of the new file or directory.</param>
+		/// <remarks>This method will throw an exception when the destination path equals to the source path.</remarks>
 		public virtual async Task RenameItemAsync(string path, string newName)
 			=> await DoFileManagerRequest(RenameUrl, new
 			{
@@ -326,6 +411,11 @@ namespace BaiduPanApi
 				newname = newName
 			});
 
+		/// <summary>
+		/// Creates a new directory.
+		/// </summary>
+		/// <param name="path">The new directory to create.</param>
+		/// <remarks>This method will create directories recursively if part of <paramref name="path" /> doesn't exist.</remarks>
 		public virtual async Task CreateDirectoryAsync(string path)
 		{
 			var paramDict = new Dictionary<string, string>
@@ -342,6 +432,20 @@ namespace BaiduPanApi
 			}
 		}
 
+		/// <summary>
+		/// Downloads a file.
+		/// </summary>
+		/// <param name="path">The file to download.</param>
+		/// <param name="range">Specifies which part of the file to download.</param>
+		/// <param name="processDownload">Callback to process the downloaded data.</param>
+		/// <remarks>
+		/// <para><paramref name="range" /> can be <c>null</c> to download the whole file.</para>
+		/// <para>
+		/// Data sent by the Baidu servers will not be buffered. <paramref name="processDownload" /> will
+		/// be invoked as soon as the Baisu servers start to send data. The <see cref="Stream"/> passed to
+		/// <paramref name="processDownload"/> can be used to read data.
+		/// </para>
+		/// </remarks>
 		public virtual async Task DownloadFileAsync(string path, RangeHeaderValue range, Action<Stream> processDownload)
 		{
 			if (processDownload == null) throw new ArgumentNullException(nameof(processDownload));
@@ -357,6 +461,16 @@ namespace BaiduPanApi
 			}
 		}
 
+		/// <summary>
+		/// Uploads a file.
+		/// </summary>
+		/// <param name="path">The location to store the uploaded file.</param>
+		/// <param name="overwrite"><c>true</c> for overwriting any existing file.</param>
+		/// <param name="data">The data to be uploaded.</param>
+		/// <remarks>
+		/// <para>This method can upload 2GB data at most.</para>
+		/// <para>Whether the uploaded data is buffered depends on whether the length of <paramref name="data" /> is determined.</para>
+		/// </remarks>
 		public virtual async Task UploadFileAsync(string path, bool overwrite, HttpContent data)
 		{
 			SplitPath(path, out var dir, out var name);
@@ -372,6 +486,16 @@ namespace BaiduPanApi
 				CheckResponseStatus(response);
 		}
 
+		/// <summary>
+		/// Uploads a slice of a file.
+		/// </summary>
+		/// <param name="data">The data to be uploaded.</param>
+		/// <returns>MD5 hash of <paramref name="data" />.</returns>
+		/// <remarks>
+		/// <para>This method can upload 2GB data at most.</para>
+		/// <para>The uploaded slices can be concatenated to a complete file using <see cref="ConcatFileSlicesAsync" />.</para>
+		/// </remarks>
+		/// <seealso cref="UploadFileAsync" />
 		public virtual async Task<string> UploadFileSliceAsync(HttpContent data)
 		{
 			data.Headers.ContentType = new MediaTypeHeaderValue(UploadContentType);
@@ -391,6 +515,16 @@ namespace BaiduPanApi
 			}
 		}
 
+		/// <summary>
+		/// Concatenates uploaded file slices uploaded by <see cref="UploadFileSliceAsync" /> to a complete file.
+		/// </summary>
+		/// <param name="path">The location to store the concatenated file.</param>
+		/// <param name="overwrite"><c>true</c> for overwriting any existing file.</param>
+		/// <param name="slices">MD5 hash list of the slices to be concatenated.</param>
+		/// <remarks>
+		/// <paramref name="slices" /> is the list of MD5 hash values returned by <see cref="UploadFileSliceAsync" />,
+		/// it should contain at least two elements.
+		/// </remarks>
 		public virtual async Task ConcatFileSlicesAsync(string path, bool overwrite, string[] slices)
 		{
 			using (var client = new HttpClient(handler, false) { BaseAddress = new Uri(BaiduPanPcsUrl) })
