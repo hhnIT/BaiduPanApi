@@ -31,14 +31,7 @@ deploy:
     prerelease: true
     description: |
       **Release Notes**
-      - Migrate to use `System.Net.Http.HttpClient` as the underlying HTTP library.
-      - Almost all public methods are changed to use `async` and added an `Async` suffix.
-      - Add support for copying.
-      - Cookies checking on login is removed.
-      - Cache is now disposed in `CachedBaiduPanContent.Dispose()`.
-      - Corresponding cache entries will be cleared after uploading files in `CachedBaiduPanContent`.
-      - `DeleteItemAsync()`, `MoveItemAsync()` and `RenameItemAsync()` now return correct error codes.
-      - The `IsUnknownError` property of `BaiduPanApiException` and `BaiduPanLoginException` now returns correct value.
+      - Bug fix for captcha login.
     auth_token:
       secure: 5AlQWeRE8ygXF64hrS4Eix9lMiicAnetjiu9l91QHTb2Oao+gBnPHsIGdEh5GCvM
     on:
