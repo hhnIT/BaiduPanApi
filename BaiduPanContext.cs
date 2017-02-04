@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.ExceptionServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -95,7 +96,7 @@ namespace BaiduPanApi
 				LoginAsync(username, password, GetLoginTokenAsync().Result, captchaCallback).Wait();
 				bdsToken = GetBdsTokenAsync().Result;
 			}
-			catch (AggregateException ex) { throw ex.InnerException; }
+			catch (AggregateException ex) { ExceptionDispatchInfo.Capture(ex.InnerException).Throw(); }
 		}
 
 		/// <summary>
@@ -120,7 +121,7 @@ namespace BaiduPanApi
 			{
 				disposed = true;
 				try { DisposeAsync().Wait(); }
-				catch (AggregateException ex) { throw ex.InnerException; }
+				catch (AggregateException ex) { ExceptionDispatchInfo.Capture(ex.InnerException).Throw(); }
 			}
 		}
 
