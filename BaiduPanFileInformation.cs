@@ -38,17 +38,13 @@ namespace BaiduPanApi
 		/// <summary>
 		/// The last time when the file or directory is modified.
 		/// </summary>
-		/// /// <remarks>
-		/// The time is in local timezone.
-		/// </remarks>
+		/// <remarks>The time is in local timezone.</remarks>
 		public DateTime DateModified;
 
 		/// <summary>
 		/// Size of the file.
 		/// </summary>
-		/// <remarks>
-		/// <c>0</c> if this item is a directory.
-		/// </remarks>
+		/// <remarks><c>0</c> if this item is a directory.</remarks>
 		public long Size;
 	}
 }
