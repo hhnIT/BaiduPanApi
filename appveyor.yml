@@ -22,7 +22,7 @@ after_build:
       $dir = "bin\$config"
       if ($Env:APPVEYOR_REPO_TAG -eq "true") { .\NuGet pack -Properties Configuration=$config -Symbols }
       md "$name"
-      cp @("$dir\*.dll", "$dir\$project.xml", "$dir\$project.pdb") "$name"
+      cp @("$dir\*.dll", "$dir\$project.xml", "$dir\$project.pdb", "LICENSE") "$name"
       7z a "$name.zip" "$name"
 artifacts:
   - path: '*.nupkg'
