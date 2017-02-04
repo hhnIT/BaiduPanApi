@@ -64,7 +64,10 @@ deploy:
     prerelease: true
     description: |
       **Release Notes**
-      - Bug fix for captcha login.
+      - Add API documentation, which is hosted at https://hackingbaidu.github.io/BaiduPanApi/docs.
+      - Publish license information, XML documentation and the pdb file along with binary files.
+      - BaiduPanApiException.ErrorMessages is not exposed now.
+      - The constructor of BaiduPanContext now throw the inner exception instead of an AggregateException.
     auth_token:
       secure: 5AlQWeRE8ygXF64hrS4Eix9lMiicAnetjiu9l91QHTb2Oao+gBnPHsIGdEh5GCvM
     on:
