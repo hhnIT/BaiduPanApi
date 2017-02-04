@@ -15,11 +15,14 @@ build:
 before_build:
   - ps: .\NuGet restore
 after_build:
-  - ps: if ($Env:APPVEYOR_REPO_TAG -eq "true") { .\NuGet pack -Prop Configuration=Release }
   - ps: |
+      $config = $Env:CONFIGURATION
+      $project = $Env:APPVEYOR_PROJECT_NAME
       $name = "BaiduPanApi-$Env:APPVEYOR_BUILD_VERSION"
+      $dir = "bin\$config"
+      if ($Env:APPVEYOR_REPO_TAG -eq "true") { .\NuGet pack -Properties Configuration=$config -Symbols }
       md "$name"
-      cp "bin\$Env:CONFIGURATION\*.dll" "$name"
+      cp @("$dir\*.dll", "$dir\$project.xml", "$dir\$project.pdb") "$name"
       7z a "$name.zip" "$name"
 artifacts:
   - path: '*.nupkg'
