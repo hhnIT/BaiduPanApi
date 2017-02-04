@@ -98,8 +98,9 @@ namespace BaiduPanApi
 		public bool IsUnknownError => !ErrorMessages.ContainsKey(ErrorCode);
 
 		/// <summary>
-		/// The error message corresponds to <see cref="ErrorCode" />.
+		/// Gets the error message corresponds to <see cref="ErrorCode" />.
 		/// </summary>
+		/// <value>The error message corresponds to <see cref="ErrorCode" />.</value>
 		public override string Message => ErrorMessages.TryGetValue(ErrorCode, out var msg) ? msg : "Unknown error";
 
 		/// <summary>

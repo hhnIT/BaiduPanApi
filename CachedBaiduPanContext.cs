@@ -88,8 +88,9 @@ namespace BaiduPanApi
 		}
 
 		/// <summary>
-		/// Clear all cache entries with specified path.
+		/// Clear all cache entries related to specified file or directory.
 		/// </summary>
+		/// <param name="path">The file or directory to clear cache for.</param>
 		public void ClearCache(string path) => RemoveCacheByPrefixes(path + "$");
 
 		/// <summary>
