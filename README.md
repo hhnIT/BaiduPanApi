@@ -54,3 +54,7 @@ A .NET wrapper for BaiduPan API.
 [![License](https://www.gnu.org/graphics/gplv3-127x51.png)](LICENSE)
 
 本项目使用GPLv3许可证，详细信息参见[LICENSE](LICENSE)。
+
+[![License](https://www.gnu.org/graphics/gfdl-logo-small.png)](LICENSE)
+
+本项目的API文档使用GFDLv1.3，详细信息参见[LICENSE](https://github.com/HackingBaidu/BaiduPanApi/blob/gh-pages/LICENSE)。
