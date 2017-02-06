@@ -34,7 +34,7 @@ A .NET wrapper for BaiduPan API.
 # 使用
 
 - 使用NuGet包：https://www.nuget.org/packages/BaiduPanApi
-- 在GitHub Release页面下载编译好的dll库：https://github.com/HackingBaidu/BaiduPanApi/releases
+- 在GitHub Release页面下载编译好的`DLL`库：https://github.com/HackingBaidu/BaiduPanApi/releases
 - 从源代码编译：需要Visual Studio 2017提供的C# 7支持
 
 # API
