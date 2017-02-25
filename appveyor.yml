@@ -15,9 +15,9 @@ install:
       if ($Env:APPVEYOR_REPO_TAG -eq "true")
       {
           $keyFile = "C:\Users\appveyor\.ssh\id_ed25519"
-          sc "$keyFile" "-----BEGIN OPENSSH PRIVATE KEY-----"
-          ac "$keyFile" $Env:PRIV_KEY.Replace(" ", "`n")
-          ac "$keyFile" "-----END OPENSSH PRIVATE KEY-----"
+          sc "$keyFile" "-----BEGIN OPENSSH PRIVATE KEY-----`n" -NoNewLine
+          ac "$keyFile" $Env:PRIV_KEY.Replace(" ", "`n") -NoNewLine
+          ac "$keyFile" "`n-----END OPENSSH PRIVATE KEY-----`n" -NoNewLine
           git config --global user.name "$Env:APPVEYOR_REPO_COMMIT_AUTHOR"
           git config --global user.email "$Env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL"
       }
