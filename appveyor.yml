@@ -72,10 +72,8 @@ deploy:
     prerelease: true
     description: |
       **Release Notes**
-      - Add API documentation, which is hosted at https://hackingbaidu.github.io/BaiduPanApi/docs.
-      - Publish license information, XML documentation and the pdb file along with binary files.
-      - BaiduPanApiException.ErrorMessages is not exposed now.
-      - The constructor of BaiduPanContext now throw the inner exception instead of an AggregateException.
+      - Some exception stack trace information is now preserved.
+      - This release is mainly for testing the new keys after switching to a new account.
     auth_token:
       secure: saJApLHQjPJ+XmMy3Qk+khAvfIKI4dveBtSnUESRX14qpUy3WPlhM97Ixbja/Tjg
     on:

@@ -7,5 +7,5 @@ using System.Reflection;
 
 [assembly: ComVisible(false)]
 
-[assembly: AssemblyVersion("0.6.2")]
-[assembly: AssemblyInformationalVersion("0.6.2-alpha")]
+[assembly: AssemblyVersion("0.6.3")]
+[assembly: AssemblyInformationalVersion("0.6.3-alpha")]
