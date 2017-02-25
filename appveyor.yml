@@ -9,15 +9,15 @@ init:
 environment:
   SHFBROOT: C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder
   PRIV_KEY:
-    secure: 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
+    secure: DP0MMmNx8N5NEY+E50itzl6w7JX08ARMWjzGPwZtKeiKZtQ3tfF/I3w462A4xhArvSokODxdIAGxEjNTrGu5phJ6b2KH7bcH5baG0RXHg42OErC2btph9iTrefCsa+vZTn0NgTUudlegX5sw6DnLHQ3x5uq8DM0KJ9Xbkbz7jbQW7IeHCLddXAEyqHpKhn693KADHbyL6mXU7VnlZhPtMaawISYMM3ZO9EllRWXddW6B3cGeG+gUx1yuZbU7eX/5cVaxeL/elEJQF0H/Gq1OLjD/WLG6mfo3llqEeXc2uyvGc7f3q+Qv8QdgTwjlgpN4aar1q80xQXXM7gdsCCPm4XjnJl5j7+18tJ9dULVEHILiVQcoidfe6yQPaQ5k++wBpongIwtZIwaas5dIhkBGdJSfQspoXM7BsrFWX/c2msNeZKuu9EupX45l58u0pZyY6/6+gp53i/fumgqlC1ORxQ==
 install:
   - ps: |
       if ($Env:APPVEYOR_REPO_TAG -eq "true")
       {
-          $keyFile = "C:\Users\appveyor\.ssh\id_rsa"
-          sc "$keyFile" "-----BEGIN RSA PRIVATE KEY-----"
+          $keyFile = "C:\Users\appveyor\.ssh\id_ed25519"
+          sc "$keyFile" "-----BEGIN OPENSSH PRIVATE KEY-----"
           ac "$keyFile" $Env:PRIV_KEY.Replace(" ", "`n")
-          ac "$keyFile" "-----END RSA PRIVATE KEY-----"
+          ac "$keyFile" "-----END OPENSSH PRIVATE KEY-----"
           git config --global user.name "$Env:APPVEYOR_REPO_COMMIT_AUTHOR"
           git config --global user.email "$Env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL"
       }
@@ -77,11 +77,11 @@ deploy:
       - BaiduPanApiException.ErrorMessages is not exposed now.
       - The constructor of BaiduPanContext now throw the inner exception instead of an AggregateException.
     auth_token:
-      secure: 5AlQWeRE8ygXF64hrS4Eix9lMiicAnetjiu9l91QHTb2Oao+gBnPHsIGdEh5GCvM
+      secure: saJApLHQjPJ+XmMy3Qk+khAvfIKI4dveBtSnUESRX14qpUy3WPlhM97Ixbja/Tjg
     on:
       appveyor_repo_tag: true
   - provider: NuGet
     api_key:
-      secure: ns4FQHCpiRJ4EfFSKpIMEHYX8H+kUVg7xsZWLXbI2yg17TLkjGPd/LrLQf3ZHD0B
+      secure: 36z2xiUQ/AJY8ftiUBVRF2eA902THRRfWmlxDtmo9srIGw5FiI/vHyn71WUYc0YX
     on:
       appveyor_repo_tag: true

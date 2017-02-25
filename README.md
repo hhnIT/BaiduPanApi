@@ -1,6 +1,6 @@
 ﻿# BaiduPanApi
 
-[![Build status](https://ci.appveyor.com/api/projects/status/y39a55l6la2cjwel?svg=true)](https://ci.appveyor.com/project/sqc1999/baidupanapi)
+[![Build status](https://ci.appveyor.com/api/projects/status/y39a55l6la2cjwel?svg=true)](https://ci.appveyor.com/project/ddosolitary/baidupanapi)
 [![NuGet status](https://img.shields.io/nuget/v/BaiduPanApi.svg)](https://www.nuget.org/packages/BaiduPanApi)
 
 A .NET wrapper for BaiduPan API.
